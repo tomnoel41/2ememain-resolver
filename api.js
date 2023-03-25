@@ -10,7 +10,7 @@ app.get('/search/:product', async (req, res) => {
 
   // Recherche sur Alternate
   try {
-    const alternate = await axios.get(`https://www.alternate.fr/html/search.html?query=${productName}`);
+    const alternate = await axios.get(`https://fr.alternate.be/html/search.html?query=${productName}`);
     const $ = cheerio.load(alternate.data);
     const price = $('span.price').first().text().replace(/\s/g, '');
     prices.alternate = price;
@@ -26,6 +26,16 @@ app.get('/search/:product', async (req, res) => {
     prices.ldlc = price;
   } catch (error) {
     console.error(`Erreur lors de la recherche sur LDLC: ${error}`);
+  }
+
+  // Recherche sur TopAchat
+  try {
+    const topachat = await axios.get(`https://www.topachat.com/search/${productName}`);
+    const $ = cheerio.load(topachat.data);
+    const price = $('span.offer-price__price').first().text().replace(/\s/g, '');
+    prices.topachat = price;
+  } catch (error) {
+    console.error(`Erreur lors de la recherche sur TopAchat: ${error}`);
   }
 
   // Calcul de la moyenne des prix
