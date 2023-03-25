@@ -18,8 +18,6 @@ This program is useful for people who want to quickly compare prices of a produc
 
 However, this tool was developed to provide hardware inventories with the price of an item.
 
-Translated with www.DeepL.com/Translator (free version)
-
 # Usage
 
 GET /search/Product Name
