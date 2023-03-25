@@ -1,8 +1,19 @@
 const express = require('express');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const rateLimit = require("express-rate-limit");
+
+const rlAPI = rateLimit({
+  windowMs: 1 * 60 * 1000, // 2 minutes
+  max: 10, // limit each IP to 45 requests per windowMs
+  message: { error: "Too many requests, please try again later" },
+  handler: (req, res, next) => {
+    res.status(429).json({ error: "Too many requests, please try again later" });
+  }
+});
 
 const app = express();
+app.use(rlAPI);
 
 app.get('/search/:product', async (req, res) => {
   const productName = req.params.product;
