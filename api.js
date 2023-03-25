@@ -70,8 +70,15 @@ app.get('/search/:product', async (req, res) => {
     averagePrice: averagePrice
   };
 
-  // Envoi de la réponse JSON
-  res.json(response);
+  if (req.query.download == true) {
+    // Envoi du fichier JSON
+    res.setHeader('Content-disposition', `attachment; filename=ItemPriceSearch-${productName}.json`);
+    res.setHeader('Content-type', 'application/json');
+    res.json(response);
+  } else {
+    // Envoi de la réponse JSON
+    res.json(response);
+  }
 });
 
 app.listen(3000, () => {
