@@ -38,6 +38,16 @@ app.get('/search/:product', async (req, res) => {
     console.error(`Erreur lors de la recherche sur TopAchat: ${error}`);
   }
 
+  // Recherche sur RueDuCommerce
+  try {
+    const rueducommerce = await axios.get(`https://www.rueducommerce.fr/r/${productName}`);
+    const $ = cheerio.load(rueducommerce.data);
+    const price = $('span.item__price--new-box').first().text().replace(/\s/g, '');
+    prices.rueducommerce = price;
+  } catch (error) {
+    console.error(`Erreur lors de la recherche sur RueDuCommerce: ${error}`);
+  }
+
   // Calcul de la moyenne des prix
   const priceArray = Object.values(prices).filter(price => !isNaN(parseFloat(price)));
   const averagePrice = priceArray.length > 0 ? (priceArray.reduce((acc, price) => acc + parseFloat(price), 0) / priceArray.length).toFixed(2) : null;
