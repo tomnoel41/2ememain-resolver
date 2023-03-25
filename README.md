@@ -9,4 +9,4 @@ This software is an API for searching the price of electronic products on variou
 # Usage
 
 GET /search/Product Name<br>
-GET /search/ProductName?download=true (for download response)
+GET /search/Product Name?download=true (for download response)
