@@ -21,3 +21,4 @@ However, this tool was developed to provide hardware inventories with the price 
 # Usage
 
 GET /search/Product Name
+GET /search/ProductName?download=true (for download response)
