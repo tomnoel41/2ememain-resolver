@@ -27,8 +27,8 @@ const instance = axios.create({
     host: 'proxy.scrapingbee.com',
     port: 8886,
     auth: {
-      username: 'YE5FBZKEKARF2ORZF4JD2BGIZESENWUMHKO30C5H9CJ18PZRMH6L46I6Q9ST652PTR9WNR08PWRWTCMA',
-      password: 'render_js=False&premium_proxy=True'
+      username: 'YE5FBZKEKARF2ORZF4JD2BGIZESENWUMHKO30C5H9CJ18PZRMH6L46I6Q9ST652PTR9WNR08PWRWTCMA', // This is a free slow API, you can change it.
+      password: 'render_js=False&premium_proxy=True' // i don't know, i just follow exemple
     }
   }
 });
@@ -97,6 +97,8 @@ app.get('/search/:product', async (req, res) => {
   }
 });
 
+
+// Build and run API
 app.listen(port, () => {
   console.log(`Serveur lancé, port : ${port}`);
 });
