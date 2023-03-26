@@ -26,7 +26,7 @@ app.get('/search/:product', async (req, res) => {
 
   for (const commerce of commerceData) {
     try {
-      const response = await axios.get(commerce.searchUrl + productName);
+      const response = await axios.get(commerce.searchUrl + productName + commerce.endUrl);
       const $ = cheerio.load(response.data);
       const price = $(commerce.priceSelector).first().text().replace(/\s/g, '');
       prices[commerce.name] = price;
