@@ -1,9 +1,12 @@
+// Libraries 
 const express = require('express');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const fs = require('fs');
 const rateLimit = require("express-rate-limit");
 
+// Configuration
+const port = 3000;
 const rlAPI = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
   max: 45, // limit each IP to 45 requests per windowMs
@@ -14,8 +17,7 @@ const rlAPI = rateLimit({
 });
 
 const app = express();
-app.use(rlAPI);
-
+app.use(rlAPI); // Remove if you do not want a rate limit
 const commerceData = JSON.parse(fs.readFileSync('commerce.json'));
 
 app.get('/search/:product', async (req, res) => {
@@ -33,28 +35,28 @@ app.get('/search/:product', async (req, res) => {
     }
   }
 
-  // Calcul de la moyenne des prix
+  // Calculation of the average price
   const priceArray = Object.values(prices).filter(price => !isNaN(parseFloat(price)));
   const averagePrice = priceArray.length > 0 ? (priceArray.reduce((acc, price) => acc + parseFloat(price), 0) / priceArray.length).toFixed(2) : null;
 
-  // Construction de la réponse JSON
+  // Building the JSON response
   const response = {
     product: productName,
     prices: prices,
     averagePrice: averagePrice
   };
 
-  if (req.query.download == true) {
-    // Envoi du fichier JSON
+  if (req.query.download) {
+    // Sending the JSON file
     res.setHeader('Content-disposition', `attachment; filename=ItemPriceSearch-${productName}.json`);
     res.setHeader('Content-type', 'application/json');
     res.json(response);
   } else {
-    // Envoi de la réponse JSON
+    // Sending the JSON response
     res.json(response);
   }
 });
 
-app.listen(3000, () => {
-  console.log('Serveur lancé sur le port 3000');
+app.listen(port, () => {
+  console.log(`Serveur lancé, port : ${port}`);
 });
