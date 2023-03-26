@@ -20,6 +20,19 @@ const app = express();
 app.use(rlAPI); // Remove if you do not want a rate limit
 const commerceData = JSON.parse(fs.readFileSync('commerce.json'));
 
+// Configure Proxy for all request to commercial websites
+const instance = axios.create({
+  proxy: {
+    protocol: 'http',
+    host: 'proxy.scrapingbee.com',
+    port: 8886,
+    auth: {
+      username: 'YE5FBZKEKARF2ORZF4JD2BGIZESENWUMHKO30C5H9CJ18PZRMH6L46I6Q9ST652PTR9WNR08PWRWTCMA',
+      password: 'render_js=False&premium_proxy=True'
+    }
+  }
+});
+
 // Log function
 function addLog(ip, response) {
   const logEntry = { ip, response };
@@ -52,7 +65,7 @@ app.get('/search/:product', async (req, res) => {
 
   for (const commerce of commerceData) {
     try {
-      const response = await axios.get(commerce.searchUrl + productName);
+      const response = await instance.get(commerce.searchUrl + productName);
       const $ = cheerio.load(response.data);
       const price = $(commerce.priceSelector).first().text().replace(/\s/g, '');
       prices[commerce.name] = price;
