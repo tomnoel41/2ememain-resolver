@@ -7,6 +7,14 @@ Ce logiciel est une API permettant de rechercher le prix de produits électroniq
 This software is an API for searching the price of electronic products on various online shopping sites. Simply provide the name of the product and the API will return the search results and corresponding prices. Results can be filtered by shopping site and users can add their own shopping sites by modifying the commerce.json file. The code is easily modifiable and can be integrated into an existing web application.
 
 # Usage
-
+<a href="https://itempricesearch.tomnoel.cloud/" target="_blank">Discover - Exemple</a><br>
 GET /search/Product Name<br>
 GET /search/Product Name?download=1 (for download response on .json)
+
+# Installation
+
+```bash
+git clone https://github.com/tomnoel41/ItemPriceSearch-API.git
+cd ItemPriceSearch-API
+node api.js
+```
