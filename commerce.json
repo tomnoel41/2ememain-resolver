@@ -5,6 +5,11 @@
         "priceSelector": "span.price"
     },
     {
+        "name": "LDLC",
+        "searchUrl": "https://www.ldlc.com/recherche/",
+        "priceSelector": "div.price"
+    },
+    {
         "name": "TopAchat",
         "searchUrl": "https://www.topachat.com/search/",
         "priceSelector": "span.offer-price__price"
