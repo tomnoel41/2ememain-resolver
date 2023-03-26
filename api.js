@@ -20,6 +20,28 @@ const app = express();
 app.use(rlAPI); // Remove if you do not want a rate limit
 const commerceData = JSON.parse(fs.readFileSync('commerce.json'));
 
+// Log function
+function addLog(ip, response) {
+  const logEntry = { ip, response };
+  const logFile = "log.json";
+  if (!fs.existsSync("log.json")) {
+    fs.writeFileSync("log.json", "[]");
+  }
+
+  // Read existing logs
+  let logs = [];
+  try {
+    const data = fs.readFileSync(logFile);
+    logs = JSON.parse(data);
+  } catch (err) {}
+
+  // Add the new log entry
+  logs.push(logEntry);
+
+  // Write logs to file
+  fs.writeFileSync(logFile, JSON.stringify(logs));
+}
+
 app.get('/', async (req, res) => {
   res.send({get : "/search/<product_name>", getdownload : "/search/<product_name>?download=1"})
 });
@@ -58,6 +80,7 @@ app.get('/search/:product', async (req, res) => {
   } else {
     // Sending the JSON response
     res.json(response);
+    addLog(req.ip, response);
   }
 });
 
