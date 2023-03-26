@@ -20,13 +20,17 @@ const app = express();
 app.use(rlAPI); // Remove if you do not want a rate limit
 const commerceData = JSON.parse(fs.readFileSync('commerce.json'));
 
+app.get('/', async (req, res) => {
+  res.send({get : "/search/<product_name>", getdownload : "/search/<product_name>?download=1"})
+});
+
 app.get('/search/:product', async (req, res) => {
   const productName = req.params.product;
   const prices = {};
 
   for (const commerce of commerceData) {
     try {
-      const response = await axios.get(commerce.searchUrl + productName + commerce.endUrl);
+      const response = await axios.get(commerce.searchUrl + productName);
       const $ = cheerio.load(response.data);
       const price = $(commerce.priceSelector).first().text().replace(/\s/g, '');
       prices[commerce.name] = price;
