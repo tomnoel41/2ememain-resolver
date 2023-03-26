@@ -10,3 +10,11 @@ This software is an API for searching the price of electronic products on variou
 
 GET /search/Product Name<br>
 GET /search/Product Name?download=1 (for download response on .json)
+
+# Installation
+
+```bash
+git clone https://github.com/tomnoel41/ItemPriceSearch-API.git
+cd ItemPriceSearch-API
+node api.js
+```
