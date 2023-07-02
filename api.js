@@ -1,104 +1,78 @@
-// Libraries 
 const express = require('express');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const fs = require('fs');
-const rateLimit = require("express-rate-limit");
+const { WebhookClient } = require('discord.js');
 
-// Configuration
 const port = 3000;
-const rlAPI = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  max: 45, // limit each IP to 45 requests per windowMs
-  message: { error: "Too many requests, please try again later" },
-  handler: (req, res, next) => {
-    res.status(429).json({ error: "Too many requests, please try again later" });
-  }
-});
-
 const app = express();
-app.use(rlAPI); // Remove if you do not want a rate limit
-const commerceData = JSON.parse(fs.readFileSync('commerce.json'));
+const instance = axios.create();
+let previousAds = [];
 
-// Configure Proxy for all request to commercial websites
-const instance = axios.create({
-  proxy: {
-    protocol: 'http',
-    host: 'proxy.scrapingbee.com',
-    port: 8886,
-    auth: {
-      username: 'YE5FBZKEKARF2ORZF4JD2BGIZESENWUMHKO30C5H9CJ18PZRMH6L46I6Q9ST652PTR9WNR08PWRWTCMA', // This is a free slow API, you can change it.
-      password: 'render_js=False&premium_proxy=True' // i don't know, i just follow exemple
-    }
-  }
-});
+const productName = "Peugot Fox Classe A";
+const name = '2ememain';
+const searchUrl = 'https://www.2ememain.be/q/';
+const endUrl = '/#Language:all-languages|sortBy:SORT_INDEX|sortOrder:DECREASING|searchInTitleAndDescription:true';
+const priceSelector = 'span.hz-text-price-label';
+const nameSelector = 'h3.hz-Listing-title';
+const descriptionSelector = 'p.hz-Listing-description';
+const adSelector = 'li.hz-Listing';
+const webhook = new WebhookClient({ id: '1125138318670188544', token: '_pMXrwDEsT3KUKOf6DsLCvtHv9UTdXniEsQujFXQRQArk3IFlCr38jlwRASXOlrI_I60' });
 
-// Log function
-function addLog(ip, response) {
-  const logEntry = { ip, response };
-  const logFile = "log.json";
-  if (!fs.existsSync("log.json")) {
-    fs.writeFileSync("log.json", "[]");
-  }
+app.get('/search/', async (req, res) => {
+  const ads = [];
 
-  // Read existing logs
-  let logs = [];
   try {
-    const data = fs.readFileSync(logFile);
-    logs = JSON.parse(data);
-  } catch (err) {}
+    const response = await instance.get(searchUrl + productName);
+    const $ = cheerio.load(response.data);
 
-  // Add the new log entry
-  logs.push(logEntry);
+    $(adSelector).each((index, element) => {
+      const price = $(element).find(priceSelector).first().text().replace(/\s/g, '');
+      const name = $(element).find(nameSelector).first().text();
+      const description = $(element).find(descriptionSelector).first().text();
 
-  // Write logs to file
-  fs.writeFileSync(logFile, JSON.stringify(logs));
-}
+      const ad = {
+        price: price,
+        name: name,
+        description: description
+      };
 
-app.get('/', async (req, res) => {
-  res.send({get : "/search/<product_name>", getdownload : "/search/<product_name>?download=1"})
-});
+      if (!previousAds.some(prevAd => prevAd.name === ad.name && prevAd.description === ad.description)) {
 
-app.get('/search/:product', async (req, res) => {
-  const productName = req.params.product;
-  const prices = {};
+        webhook.send(`Nouvelle annonce 2ememain pour le produit **${productName}** ! \n================================= \nNom de l'offre: **${ad.name}** \nDescription de l'offre: **${ad.description}** \nPrix de l'offre: **${ad.price}** \n================================= \n2ememain resolver - par <@965675962022920262>`);
 
-  for (const commerce of commerceData) {
-    try {
-      const response = await instance.get(commerce.searchUrl + productName);
-      const $ = cheerio.load(response.data);
-      const price = $(commerce.priceSelector).first().text().replace(/\s/g, '');
-      prices[commerce.name] = price;
-    } catch (error) {
-      console.error(`Error while searching on ${commerce.name}: ${error}`);
-    }
+      }
+      
+
+      ads.push(ad);
+    });
+
+  } catch (error) {
+    console.error(`Error while searching on ${name}: ${error}`);
   }
 
-  // Calculation of the average price
-  const priceArray = Object.values(prices).filter(price => !isNaN(parseFloat(price)));
-  const averagePrice = priceArray.length > 0 ? (priceArray.reduce((acc, price) => acc + parseFloat(price), 0) / priceArray.length).toFixed(2) : null;
+  previousAds = ads;
 
-  // Building the JSON response
   const response = {
     product: productName,
-    prices: prices,
-    averagePrice: averagePrice
+    totalAds: ads.length,
+    ads: ads
   };
 
-  if (req.query.download) {
-    // Sending the JSON file
-    res.setHeader('Content-disposition', `attachment; filename=ItemPriceSearch-${productName}.json`);
-    res.setHeader('Content-type', 'application/json');
-    res.json(response);
-  } else {
-    // Sending the JSON response
-    res.json(response);
-    addLog(req.ip, response);
-  }
+  res.json(response);
 });
 
-
-// Build and run API
 app.listen(port, () => {
   console.log(`Serveur lancé, port : ${port}`);
 });
+
+// Fonction pour vérifier les nouvelles annonces
+async function checkForNewAds() {
+  const response = await axios.get(`http://localhost:${port}/search/`);
+}
+
+// Appeler la fonction pour la première fois
+checkForNewAds();
+
+// Planifier l'exécution de la fonction toutes les 1 minute
+setInterval(checkForNewAds, 1 * 60 * 1000);

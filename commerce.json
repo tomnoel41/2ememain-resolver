@@ -1,27 +1,11 @@
 [
     {
-        "name": "Alternate",
-        "searchUrl": "https://fr.alternate.be/html/search.html?query=",
-        "priceSelector": "span.price"
-    },
-    {
-        "name": "LDLC",
-        "searchUrl": "https://www.ldlc.com/recherche/",
-        "priceSelector": "div.price"
-    },
-    {
-        "name": "TopAchat",
-        "searchUrl": "https://www.topachat.com/search/",
-        "priceSelector": "span.offer-price__price"
-    },
-    {
-        "name": "RueDuCommerce",
-        "searchUrl": "https://www.rueducommerce.fr/r/",
-        "priceSelector": "span.item__price--new-box"
-    },
-    {
-        "name": "",
-        "searchUrl": "",
-        "priceSelector": ""
+        "name": "2ememain",
+        "searchUrl": "https://www.2ememain.be/q/",
+        "endUrl": "/#Language:all-languages|sortBy:SORT_INDEX|sortOrder:DECREASING|searchInTitleAndDescription:true",
+        "priceSelector": "span.hz-text-price-label",
+        "nameSelector": "h3.hz-Listing-title",
+        "descriptionSelector": "p.hz-Listing-description",
+        "adSelector": "li.hz-Listing"
     }
 ]
